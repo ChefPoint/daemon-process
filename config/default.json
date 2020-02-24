@@ -1,0 +1,14 @@
+{
+  "title": "CHEF POINT Process - Dev",
+  "database": {
+    "connection-string": "mongodb://localhost/chefpoint-connect"
+  },
+  "auth": {
+    "vendusAPI": "none-available"
+  },
+  "settings": {
+    "test-mode-enabled": true,
+    "send-digital-invoices": true,
+    "default-tax-id": "INT"
+  }
+}

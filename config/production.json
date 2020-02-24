@@ -1,0 +1,14 @@
+{
+  "title": "CHEF POINT Process",
+  "database": {
+    "connection-string": "env-var"
+  },
+  "auth": {
+    "vendusAPI": "env-var"
+  },
+  "settings": {
+    "test-mode-enabled": false,
+    "send-digital-invoices": true,
+    "default-tax-id": "INT"
+  }
+}
