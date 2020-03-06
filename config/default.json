@@ -1,10 +1,10 @@
 {
-  "title": "CHEF POINT Process - Dev",
+  "title": "CHEF POINT Daemon (process) - Dev",
   "database": {
     "connection-string": "mongodb://localhost/chefpoint-connect"
   },
   "auth": {
-    "vendusAPI": "none-available"
+    "vendusAPI": "env-var"
   },
   "settings": {
     "test-mode-enabled": true,

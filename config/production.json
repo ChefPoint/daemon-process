@@ -1,5 +1,5 @@
 {
-  "title": "CHEF POINT Process",
+  "title": "CHEF POINT Daemon (process)",
   "database": {
     "connection-string": "env-var"
   },
