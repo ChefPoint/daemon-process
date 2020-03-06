@@ -1,5 +1,5 @@
 {
-  "title": "CHEF POINT Daemon (process) - Dev",
+  "title": "CHEF POINT Daemon - Process (Dev)",
   "database": {
     "connection-string": "mongodb://localhost/chefpoint-connect"
   },

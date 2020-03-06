@@ -1,7 +1,7 @@
 {
   "name": "chefpoint-daemon-process",
   "version": "1.0.0",
-  "description": "CHEF POINT Daemon (process), built on Node.js and MongoDB",
+  "description": "CHEF POINT Daemon - Process, built on Node.js and MongoDB",
   "main": "index.js",
   "scripts": {
     "test": "jest --watch-all --verbose",
