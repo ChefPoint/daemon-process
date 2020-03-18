@@ -34,6 +34,7 @@ module.exports = async () => {
   transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
 
   for (const transaction of transactions) {
+    await new Promise(resolve => setTimeout(resolve, 100));
     console.log(transaction.closed_at);
   }
   await mongoose.disconnect();
