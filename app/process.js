@@ -33,7 +33,7 @@ module.exports = async () => {
   // Order transactions by date ascending
   transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
 
-  console.log(transactions);
+  console.log(transactions.closed_at);
   await mongoose.disconnect();
   logger.info("Disconnected from MongoDB.");
   return;
