@@ -18,7 +18,17 @@ exports.Transaction = mongoose.model(
       maxlength: 100,
       required: true
     },
-    location_id: {
+    locationShortName: {
+      type: String,
+      maxlength: 100,
+      required: true
+    },
+    squareLocationID: {
+      type: String,
+      maxlength: 100,
+      required: true
+    },
+    vendusRegisterID: {
       type: String,
       maxlength: 100,
       required: true

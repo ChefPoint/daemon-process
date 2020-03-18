@@ -9,10 +9,11 @@
 /* IMPORTS */
 const config = require("config");
 const mongoose = require("mongoose");
+const _ = require("lodash");
+
 const logger = require("../services/logger");
 const processAPI = require("../services/processAPI");
 const vendusAPI = require("../services/vendusAPI");
-const { Store } = require("../models/Store");
 const { Transaction } = require("../models/Transaction");
 const { PrintQueue } = require("../models/PrintQueue");
 
@@ -20,36 +21,22 @@ const { PrintQueue } = require("../models/PrintQueue");
 /* At program initiation all stores are retrieved from the database */
 /* and, for each store, transactions are retrieved from the database. */
 /* Each one is processed into an invoice by the Vendus API. */
-module.exports = async (request, response) => {
-  // Get all store locations from the database
-  const stores = await Store.find({});
-
-  // For each store, process it's transactions
-  for (const store of stores) {
-    logger.info("Processing transactions for [" + store.name + "]...");
-    await processStoreTransactions(
-      store.squareLocationID,
-      store.vendusRegisterID
-    );
-  }
-
-  // Disconnect from the database after program completion
-  await mongoose.disconnect();
-  logger.info("Disconnected from MongoDB.");
-};
-
-/* * */
-/* At program initiation all stores are retrieved from the database */
-const processStoreTransactions = async (squareLocationID, vendusRegisterID) => {
-  // Get matching transactions from the database
-  const transactions = await Transaction.find({
-    location_id: squareLocationID
-  });
+module.exports = async () => {
+  // Get transactions from the database
+  let transactions = await Transaction.find({});
 
   // If response is empty, return no new transactions to process
   if (!transactions.length)
     return logger.info("No new transactions to process.");
   else logger.info("Processing " + transactions.length + " transactions...");
+
+  // Order transactions by date ascending
+  transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
+
+  console.log(transactions);
+  await mongoose.disconnect();
+  logger.info("Disconnected from MongoDB.");
+  return;
 
   // Counters for logging progress
   let invoicesCreated = 0;
@@ -64,7 +51,7 @@ const processStoreTransactions = async (squareLocationID, vendusRegisterID) => {
       auth: { user: config.get("auth.vendusAPI") },
       body: JSON.stringify(
         // Prepare the invoice details
-        processAPI.prepareInvoice(vendusRegisterID, transaction)
+        processAPI.prepareInvoice(transaction)
       )
     };
 
@@ -80,7 +67,9 @@ const processStoreTransactions = async (squareLocationID, vendusRegisterID) => {
         if (transaction.should_print) {
           // add it to the print queue.
           await new PrintQueue({
-            location_id: transaction.location_id,
+            locationShortName: transaction.locationShortName,
+            squareLocationID: transaction.squareLocationID,
+            vendusRegisterID: transaction.vendusRegisterID,
             invoice_id: invoice.id
           }).save();
           logger.info("Invoice (" + invoice.number + ") will be printed.");
@@ -112,4 +101,8 @@ const processStoreTransactions = async (squareLocationID, vendusRegisterID) => {
   logger.info("Done. " + transactions.length + " transactions processed.");
   logger.info(invoicesCreated + " invoices created successfully.");
   logger.info(transactionsWithErrors + " transactions with errors.");
+
+  // Disconnect from the database after program completion
+  await mongoose.disconnect();
+  logger.info("Disconnected from MongoDB.");
 };

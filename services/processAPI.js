@@ -8,13 +8,16 @@
 /* * */
 /* IMPORTS */
 const config = require("config");
+const moment = require("moment");
 
-exports.prepareInvoice = (vendusRegisterID, transaction) => {
+exports.prepareInvoice = transaction => {
   let invoice = {
     // Global setting: If true, only fiscally invalid invoices will be created
     mode: config.get("settings.test-mode-enabled") ? "tests" : "normal",
     // To which store should this invoice be attributed
-    register_id: vendusRegisterID,
+    register_id: transaction.vendusRegisterID,
+    // The date of the transaction
+    date: moment(transaction.closed_at).format("YYYY[-]MM[-]DD"),
     // Prepare final invoice items details
     items: setInvoiceItems(transaction.line_items),
     // Set payment method so a receipt is issued

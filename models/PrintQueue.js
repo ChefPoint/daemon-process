@@ -13,7 +13,17 @@ const mongoose = require("mongoose");
 exports.PrintQueue = mongoose.model(
   "PrintQueue",
   new mongoose.Schema({
-    location_id: {
+    locationShortName: {
+      type: String,
+      maxlength: 30,
+      required: true
+    },
+    squareLocationID: {
+      type: String,
+      maxlength: 30,
+      required: true
+    },
+    vendusRegisterID: {
       type: String,
       maxlength: 30,
       required: true
