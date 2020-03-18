@@ -92,11 +92,11 @@ module.exports = async () => {
   }
 
   // Log end of operation.
-  logger.info("-------------------------------------------");
+  logger.info("---------------------------------------------------------");
   logger.info("Done. " + transactions.length + " transactions processed.");
   logger.info(invoicesCreated + " invoices created successfully.");
   logger.info(transactionsWithErrors + " transactions with errors.");
-  logger.info("-------------------------------------------");
+  logger.info("---------------------------------------------------------");
 
   // Disconnect from the database after program completion
   await mongoose.disconnect();
