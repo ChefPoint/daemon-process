@@ -71,7 +71,7 @@ const processStoreTransactions = async (squareLocationID, vendusRegisterID) => {
     // For each transaction,
     // try to request for an invoice to be created.
     console.log("Waiting...");
-    await setTimeout(() => console.log("Waited 5 seconds."), 5000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     await vendusAPI
       .request(params)
       // If successful:
