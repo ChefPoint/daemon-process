@@ -22,7 +22,7 @@ const { PrintQueue } = require("../models/PrintQueue");
 /* and, for each store, transactions are retrieved from the database. */
 /* Each one is processed into an invoice by the Vendus API. */
 module.exports = async () => {
-  // Get transactions from the database
+  // Get all transactions from the database
   let transactions = await Transaction.find({});
 
   // If response is empty, return no new transactions to process
