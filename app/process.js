@@ -33,14 +33,6 @@ module.exports = async () => {
   // Order transactions by date ascending
   transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
 
-  for (const transaction of transactions) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    console.log(transaction.closed_at);
-  }
-  await mongoose.disconnect();
-  logger.info("Disconnected from MongoDB.");
-  return;
-
   // Counters for logging progress
   let invoicesCreated = 0;
   let transactionsWithErrors = 0;
@@ -61,7 +53,7 @@ module.exports = async () => {
     // For each transaction,
     // try to request for an invoice to be created.
     console.log("Waiting...");
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 300));
     await vendusAPI
       .request(params)
       // If successful:
