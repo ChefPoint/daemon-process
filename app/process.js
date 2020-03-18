@@ -25,78 +25,80 @@ module.exports = async () => {
   // Get all transactions from the database
   let transactions = await Transaction.find({});
 
-  // If response is empty, return no new transactions to process
-  if (!transactions.length)
-    return logger.info("No new transactions to process.");
-  else logger.info("Processing " + transactions.length + " transactions...");
+  // If there are transactions to process
+  if (transactions.length) {
+    logger.info("Processing " + transactions.length + " transactions...");
 
-  // Order transactions by date ascending
-  transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
+    // Order transactions by date ascending
+    transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
 
-  // Counters for logging progress
-  let invoicesCreated = 0;
-  let transactionsWithErrors = 0;
+    // Counters for logging progress
+    let invoicesCreated = 0;
+    let transactionsWithErrors = 0;
 
-  // For each transaction
-  for (const transaction of transactions) {
-    // Set the request params
-    const params = {
-      method: "POST",
-      url: vendusAPI.setAPIEndpoint("documents"),
-      auth: { user: config.get("auth.vendusAPI") },
-      body: JSON.stringify(
-        // Prepare the invoice details
-        processAPI.prepareInvoice(transaction)
-      )
-    };
+    // For each transaction
+    for (const transaction of transactions) {
+      // Set the request params
+      const params = {
+        method: "POST",
+        url: vendusAPI.setAPIEndpoint("documents"),
+        auth: { user: config.get("auth.vendusAPI") },
+        body: JSON.stringify(
+          // Prepare the invoice details
+          processAPI.prepareInvoice(transaction)
+        )
+      };
 
-    // For each transaction,
-    // try to request for an invoice to be created.
-    await new Promise(resolve => setTimeout(resolve, 300));
-    await vendusAPI
-      .request(params)
-      // If successful:
-      .then(async invoice => {
-        // Check if transaction should be printed
-        if (transaction.should_print) {
-          // add it to the print queue.
-          await new PrintQueue({
-            locationShortName: transaction.locationShortName,
-            squareLocationID: transaction.squareLocationID,
-            vendusRegisterID: transaction.vendusRegisterID,
-            invoice_id: invoice.id
-          }).save();
-          logger.info("Invoice " + invoice.number + " will be printed.");
-        }
+      // For each transaction,
+      // try to request for an invoice to be created.
+      await new Promise(resolve => setTimeout(resolve, 300));
+      await vendusAPI
+        .request(params)
+        // If successful:
+        .then(async invoice => {
+          // Check if transaction should be printed
+          if (transaction.should_print) {
+            // add it to the print queue.
+            await new PrintQueue({
+              locationShortName: transaction.locationShortName,
+              squareLocationID: transaction.squareLocationID,
+              vendusRegisterID: transaction.vendusRegisterID,
+              invoice_id: invoice.id
+            }).save();
+            logger.info("Invoice " + invoice.number + " will be printed.");
+          }
 
-        // Remove the processed transaction from the queue,
-        await transaction.remove();
-        // add +1 to the counter,
-        invoicesCreated++;
-        // and log it's basic details for debugging.
-        logger.info(
-          "> Invoice " + invoice.number + " created (" + invoice.date + ")."
-        );
-      })
-      // If an error occurs,
-      .catch(error => {
-        // add +1 to the counter
-        transactionsWithErrors++;
-        // and log it
-        logger.error(
-          "Error occured while creating invoice.",
-          "Transaction ID: " + transaction.id,
-          error
-        );
-      });
-  }
+          // Remove the processed transaction from the queue,
+          await transaction.remove();
+          // add +1 to the counter,
+          invoicesCreated++;
+          // and log it's basic details for debugging.
+          logger.info(
+            "> Invoice " + invoice.number + " created (" + invoice.date + ")."
+          );
+        })
+        // If an error occurs,
+        .catch(error => {
+          // add +1 to the counter
+          transactionsWithErrors++;
+          // and log it
+          logger.error(
+            "Error occured while creating invoice.",
+            "Transaction ID: " + transaction.id,
+            error
+          );
+        });
+    }
 
-  // Log end of operation.
-  logger.info("---------------------------------------------------------");
-  logger.info("Done. " + transactions.length + " transactions processed.");
-  logger.info(invoicesCreated + " invoices created successfully.");
-  logger.info(transactionsWithErrors + " transactions with errors.");
-  logger.info("---------------------------------------------------------");
+    // Log end of operation.
+    logger.info("---------------------------------------------------------");
+    logger.info("Done. " + transactions.length + " transactions processed.");
+    logger.info(invoicesCreated + " invoices created successfully.");
+    logger.info(transactionsWithErrors + " transactions with errors.");
+    logger.info("---------------------------------------------------------");
+
+    // If response is empty, return no new transactions to process
+  } else logger.info("No new transactions to process.");
 
   // Disconnect from the database after program completion
   await mongoose.disconnect();
