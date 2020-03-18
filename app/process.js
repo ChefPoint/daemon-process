@@ -52,7 +52,6 @@ module.exports = async () => {
 
     // For each transaction,
     // try to request for an invoice to be created.
-    console.log("Waiting...");
     await new Promise(resolve => setTimeout(resolve, 300));
     await vendusAPI
       .request(params)
@@ -67,7 +66,7 @@ module.exports = async () => {
             vendusRegisterID: transaction.vendusRegisterID,
             invoice_id: invoice.id
           }).save();
-          logger.info("Invoice (" + invoice.number + ") will be printed.");
+          logger.info("Invoice " + invoice.number + " will be printed.");
         }
 
         // Remove the processed transaction from the queue,
@@ -76,7 +75,7 @@ module.exports = async () => {
         invoicesCreated++;
         // and log it's basic details for debugging.
         logger.info(
-          "> Invoice (" + invoice.number + ") created at " + invoice.system_time
+          "> Invoice " + invoice.number + " created (" + invoice.date + ")."
         );
       })
       // If an error occurs,
@@ -93,9 +92,11 @@ module.exports = async () => {
   }
 
   // Log end of operation.
+  logger.info("-------------------------------------------");
   logger.info("Done. " + transactions.length + " transactions processed.");
   logger.info(invoicesCreated + " invoices created successfully.");
   logger.info(transactionsWithErrors + " transactions with errors.");
+  logger.info("-------------------------------------------");
 
   // Disconnect from the database after program completion
   await mongoose.disconnect();
