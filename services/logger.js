@@ -1,6 +1,6 @@
 const winston = require("winston");
 
-exports.info = message => {
+exports.info = (message) => {
   winston.info(message);
 };
 
