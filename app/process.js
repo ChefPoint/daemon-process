@@ -46,16 +46,16 @@ module.exports = async () => {
         body: JSON.stringify(
           // Prepare the invoice details
           processAPI.prepareInvoice(transaction)
-        )
+        ),
       };
 
       // For each transaction,
       // try to request for an invoice to be created.
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       await vendusAPI
         .request(params)
         // If successful:
-        .then(async invoice => {
+        .then(async (invoice) => {
           // Check if transaction should be printed
           if (transaction.should_print) {
             // add it to the print queue.
@@ -63,7 +63,7 @@ module.exports = async () => {
               locationShortName: transaction.locationShortName,
               squareLocationID: transaction.squareLocationID,
               vendusRegisterID: transaction.vendusRegisterID,
-              invoice_id: invoice.id
+              invoice_id: invoice.id,
             }).save();
             logger.info("Invoice " + invoice.number + " will be printed.");
           }
@@ -78,14 +78,14 @@ module.exports = async () => {
           );
         })
         // If an error occurs,
-        .catch(error => {
+        .catch((error) => {
           // add +1 to the counter
           transactionsWithErrors++;
           // and log it
           logger.error(
             "Error occured while creating invoice.",
             "Transaction ID: " + transaction.id,
-            error
+            "[" + error[0].code + "] " + error[0].message
           );
         });
     }
