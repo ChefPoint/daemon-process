@@ -1,13 +1,10 @@
 {
-  "title": "CHEF POINT Daemon - Process (Dev)",
-  "database": {
-    "connection-string": "mongodb://localhost/chefpoint-connect"
-  },
-  "auth": {
-    "vendusAPI": "env-var"
+  "secrets": {
+    "vendus-api-key": "envar",
+    "database-connection-string": "envar"
   },
   "settings": {
-    "test-mode-enabled": true,
+    "test-mode": true,
     "send-digital-invoices": true,
     "default-tax-id": "INT"
   }

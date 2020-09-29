@@ -1,14 +1,9 @@
-const winston = require("winston");
+"use strict";
 
-exports.info = (message) => {
-  winston.info(message);
-};
+/* * * * * */
+/* LOGGER */
+/* * */
 
-exports.error = (title, description, error, returnObject) => {
-  winston.error("* * * * * * * * * * * *");
-  winston.error(title);
-  winston.error(description);
-  console.log(error);
-  winston.error("* * * * * * * * * * * *");
-  return returnObject;
+module.exports = function (content) {
+  content ? console.log(content) : console.log();
 };
