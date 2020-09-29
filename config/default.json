@@ -6,6 +6,7 @@
   "settings": {
     "test-mode": false,
     "send-digital-invoices": true,
-    "default-tax-id": "INT"
+    "default-tax-id": "INT",
+    "delay-between-runs": 60000
   }
 }

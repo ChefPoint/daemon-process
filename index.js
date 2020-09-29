@@ -13,6 +13,7 @@ const database = require("./services/database");
 const processAPI = require("./services/processAPI");
 const Transaction = require("./models/Transaction");
 const PrintQueue = require("./models/PrintQueue");
+const delay = require("./services/delay");
 const logger = require("./services/logger");
 
 (async () => {
@@ -38,6 +39,9 @@ const logger = require("./services/logger");
   // Process transactions
   if (transactions.length) await processTransactions(transactions);
   else logger("No new transactions to process.");
+
+  // Delay to ensure no limits are hit in Vendus API
+  await delay(config.get("settings.delay-between-runs"));
 
   logger();
   logger("- - - - - - - - - - - - - - - - - - - -");
@@ -82,7 +86,7 @@ const processTransactions = async (transactions) => {
     };
 
     // Delay to ensure no limits are hit in Vendus API
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await delay(config.get("settings.delay-between-runs") / 200);
 
     // For each transaction,
     // try to request for an invoice to be created.
