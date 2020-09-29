@@ -40,7 +40,8 @@ const logger = require("./services/logger");
   if (transactions.length) await processTransactions(transactions);
   else logger("No new transactions to process.");
 
-  // Delay to ensure no limits are hit in Vendus API
+  logger(); // Delay to ensure no limits are hit in Vendus API
+  logger("Dealying...");
   await delay(config.get("settings.delay-between-runs"));
 
   logger();
