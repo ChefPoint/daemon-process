@@ -6,14 +6,14 @@
 
 /* * */
 /* IMPORTS */
-const config = require("config");
-const database = require("./services/database");
-const logger = require("./services/logger");
-const got = require("got");
-const Transaction = require("./models/Transaction");
 const _ = require("lodash");
+const config = require("config");
+const axios = require("axios");
+const database = require("./services/database");
 const processAPI = require("./services/processAPI");
-const vendusAPI = require("./services/vendusAPI");
+const Transaction = require("./models/Transaction");
+const PrintQueue = require("./models/PrintQueue");
+const logger = require("./services/logger");
 
 (async () => {
   // Store start time for logging purposes
@@ -29,19 +29,20 @@ const vendusAPI = require("./services/vendusAPI");
   await database.connect();
   logger();
 
+  if (config.get("settings.test-mode")) logger("> Test mode enabled.");
+  logger();
+
   // Get all transactions from the database
   let transactions = await Transaction.find({});
 
-  // If response is empty, return no new transactions to process
+  // Process transactions
   if (transactions.length) await processTransactions(transactions);
   else logger("No new transactions to process.");
 
   logger();
   logger("- - - - - - - - - - - - - - - - - - - -");
   logger("Shutting down...");
-
   await database.disconnect();
-
   logger("Operation took " + getDuration(startTime) / 1000 + " seconds.");
   logger("- - - - - - - - - - - - - - - - - - - -");
   logger();
@@ -69,12 +70,12 @@ const processTransactions = async (transactions) => {
 
   // For each transaction
   for (const [index, transaction] of transactions.entries()) {
-    // Set the request params
-    const params = {
+    // Set the request options
+    const options = {
       method: "POST",
-      url: vendusAPI.setAPIEndpoint("documents"),
-      auth: { user: config.get("secrets.vendus-auth-token") },
-      body: JSON.stringify(
+      url: "https://www.vendus.pt/ws/v1.2/documents",
+      auth: { username: config.get("secrets.vendus-api-key") },
+      data: JSON.stringify(
         // Prepare the invoice details
         processAPI.prepareInvoice(transaction)
       ),
@@ -85,11 +86,10 @@ const processTransactions = async (transactions) => {
 
     // For each transaction,
     // try to request for an invoice to be created.
-    await vendusAPI
-      .request(params)
+    await axios(options)
       // If successful:
-      .then(async ({ invoice }) => {
-        console.log(invoice);
+      .then(async ({ data: invoice }) => {
+        // const invoice = data;
         // Check if transaction should be printed
         if (transaction.should_print) {
           // add it to the print queue.
@@ -99,35 +99,42 @@ const processTransactions = async (transactions) => {
             vendusRegisterID: transaction.vendusRegisterID,
             invoice_id: invoice.id,
           }).save();
-          logger.info("Invoice " + invoice.number + " will be printed.");
         }
 
-        // Remove the processed transaction from the queue,
-        await transaction.remove();
-        // add +1 to the counter,
+        // Remove the processed transaction from the queue only if test mode is disabled.
+        if (!config.get("settings.test-mode")) await transaction.remove();
+
+        // Add +1 to the counter,
         invoicesCreated++;
+
         // and log it's basic details for debugging.
         logger(
           "[" +
-            index +
+            (index + 1) +
             "/" +
             transactions.length +
             "] Invoice " +
             invoice.number +
             " created (" +
             invoice.date +
-            ")."
+            ")" +
+            (transaction.should_print ? " [ print ]" : "")
         );
       })
       // If an error occurs,
-      .catch((error) => {
+      .catch(({ response }) => {
         // add +1 to the counter
         transactionsWithErrors++;
         // and log it
         logger();
         logger("> Error occured while creating invoice.");
         logger("> Transaction ID: " + transaction.id);
-        logger("> [" + error[0].code + "] " + error[0].message);
+        logger(
+          "> [" +
+            response.data.errors[0].code +
+            "] " +
+            response.data.errors[0].message
+        );
         logger();
       });
   }

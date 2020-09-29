@@ -1,6 +1,6 @@
 {
   "secrets": {
-    "vendus-auth-token": "squareAuthToken",
+    "vendus-api-key": "vendusApiKey",
     "database-connection-string": "databaseConnectionString"
   }
 }
