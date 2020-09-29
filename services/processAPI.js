@@ -13,7 +13,7 @@ const moment = require("moment");
 exports.prepareInvoice = (transaction) => {
   let invoice = {
     // Global setting: If true, only fiscally invalid invoices will be created
-    mode: config.get("settings.test-mode-enabled") ? "tests" : "normal",
+    mode: config.get("settings.test-mode") ? "tests" : "normal",
     // To which store should this invoice be attributed
     register_id: transaction.vendusRegisterID,
     // The date of the transaction

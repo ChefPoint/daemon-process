@@ -1,10 +1,10 @@
 {
   "secrets": {
-    "vendus-auth-token": "envar",
+    "vendus-api-key": "envar",
     "database-connection-string": "envar"
   },
   "settings": {
-    "test-mode-enabled": true,
+    "test-mode": true,
     "send-digital-invoices": true,
     "default-tax-id": "INT"
   }
