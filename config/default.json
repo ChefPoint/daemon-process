@@ -7,6 +7,6 @@
     "test-mode": false,
     "send-digital-invoices": true,
     "default-tax-id": "INT",
-    "delay-between-runs": 60000
+    "delay-between-runs": 120000
   }
 }
