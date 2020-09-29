@@ -24,6 +24,13 @@ const logger = require("./services/logger");
   logger(new Date().toISOString());
   logger("****************************************");
 
+  logger(); // Delay to ensure no limits are hit in Vendus API
+  logger(
+    "Paused for " +
+      config.get("settings.delay-between-runs") / 1000 +
+      " seconds"
+  );
+  await delay(config.get("settings.delay-between-runs"));
   logger();
 
   logger("Starting...");
@@ -39,10 +46,6 @@ const logger = require("./services/logger");
   // Process transactions
   if (transactions.length) await processTransactions(transactions);
   else logger("No new transactions to process.");
-
-  logger(); // Delay to ensure no limits are hit in Vendus API
-  logger("Dealying...");
-  await delay(config.get("settings.delay-between-runs"));
 
   logger();
   logger("- - - - - - - - - - - - - - - - - - - -");
