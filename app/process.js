@@ -9,9 +9,10 @@
 /* IMPORTS */
 const config = require("config");
 const mongoose = require("mongoose");
-const _ = require("lodash");
+const got = require("got");
 
 const logger = require("../services/logger");
+const _ = require("lodash");
 const processAPI = require("../services/processAPI");
 const vendusAPI = require("../services/vendusAPI");
 const { Transaction } = require("../models/Transaction");
@@ -22,9 +23,6 @@ const { PrintQueue } = require("../models/PrintQueue");
 /* and, for each store, transactions are retrieved from the database. */
 /* Each one is processed into an invoice by the Vendus API. */
 module.exports = async () => {
-  // Get all transactions from the database
-  let transactions = await Transaction.find({});
-
   // If there are transactions to process
   if (transactions.length) {
     logger.info("Processing " + transactions.length + " transactions...");

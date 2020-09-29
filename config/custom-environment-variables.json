@@ -1,8 +1,6 @@
 {
-  "database": {
-    "connection-string": "database_connectionString"
-  },
-  "auth": {
-    "vendusAPI": "auth_vendusAPI"
+  "secrets": {
+    "vendus-auth-token": "squareAuthToken",
+    "database-connection-string": "databaseConnectionString"
   }
 }

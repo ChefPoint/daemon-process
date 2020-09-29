@@ -10,28 +10,28 @@ const mongoose = require("mongoose");
 
 /* * */
 /* Schema for MongoDB ["PrintQueue"] Object */
-exports.PrintQueue = mongoose.model(
+module.exports = mongoose.model(
   "PrintQueue",
   new mongoose.Schema({
     locationShortName: {
       type: String,
       maxlength: 30,
-      required: true
+      required: true,
     },
     squareLocationID: {
       type: String,
       maxlength: 30,
-      required: true
+      required: true,
     },
     vendusRegisterID: {
       type: String,
       maxlength: 30,
-      required: true
+      required: true,
     },
     invoice_id: {
       type: String,
       maxlength: 30,
-      required: true
-    }
+      required: true,
+    },
   })
 );

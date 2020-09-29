@@ -1,8 +1,7 @@
-/* * */
-/* * */
+"use strict";
+
 /* * * * * */
-/* RETRIEVE TRANSACTIONS FROM QUEUE */
-/* AND PROCESS THEM INTO VENDUS INVOICES */
+/* VENDUS API */
 /* * */
 
 /* * */
@@ -10,20 +9,22 @@
 const request = require("request");
 
 /* * */
-/* * */
+/* RETRIEVE TRANSACTIONS FROM QUEUE */
+/* AND PROCESS THEM INTO VENDUS INVOICES */
+
 /* Prepare the request parameters */
 /* according to the Vendus API requirements. */
 /* * */
 
 /* * */
 /* Where and which service to call the Vendus API. */
-exports.setAPIEndpoint = service => {
+exports.setAPIEndpoint = (service) => {
   return "https://www.vendus.pt/ws/v1.2/" + service;
 };
 
 /* * */
 /* Request the Vendus API for the specified params. */
-exports.request = params => {
+exports.request = (params) => {
   // This method returns a Promise to it's caller,
   // which is only resolved after the correct response from the API.
   return new Promise((resolve, reject) => {

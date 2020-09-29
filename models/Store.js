@@ -16,22 +16,22 @@ exports.Store = mongoose.model(
     name: {
       type: String,
       maxlength: 30,
-      required: true
+      required: true,
     },
     squareLocationID: {
       type: String,
       maxlength: 30,
-      required: true
+      required: true,
     },
     vendusRegisterID: {
       type: String,
       maxlength: 30,
-      required: true
+      required: true,
     },
     timeSinceLastSync: {
       type: String,
       maxlength: 30,
-      required: true
-    }
+      required: true,
+    },
   })
 );
