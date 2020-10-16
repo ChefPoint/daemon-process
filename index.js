@@ -6,154 +6,59 @@
 
 /* * */
 /* IMPORTS */
-const _ = require("lodash");
 const config = require("config");
-const axios = require("axios");
 const database = require("./services/database");
 const processAPI = require("./services/processAPI");
 const Transaction = require("./models/Transaction");
-const PrintQueue = require("./models/PrintQueue");
 const delay = require("./services/delay");
-const logger = require("./services/logger");
-
-(async () => {
-  // Store start time for logging purposes
-  const startTime = process.hrtime();
-
-  logger("****************************************");
-  logger(new Date().toISOString());
-  logger("****************************************");
-
-  logger(); // Delay to ensure no limits are hit in Vendus API
-  logger(
-    "Paused for " +
-      config.get("settings.delay-between-runs") / 1000 +
-      " seconds"
-  );
-  await delay(config.get("settings.delay-between-runs"));
-  logger();
-
-  logger("Starting...");
-  await database.connect();
-  logger();
-
-  if (config.get("settings.test-mode")) logger("> Test mode enabled.");
-  logger();
-
-  // Get all transactions from the database
-  let transactions = await Transaction.find({});
-
-  // Process transactions
-  if (transactions.length) await processTransactions(transactions);
-  else logger("No new transactions to process.");
-
-  logger();
-  logger("- - - - - - - - - - - - - - - - - - - -");
-  logger("Shutting down...");
-  await database.disconnect();
-  logger("Operation took " + getDuration(startTime) / 1000 + " seconds.");
-  logger("- - - - - - - - - - - - - - - - - - - -");
-  logger();
-})();
 
 /* * */
-/* The caller provides the store object containing squareLocationID and lastSyncTime. */
-/* Two operations are performed in this function: */
-/* First, orders are retrieved from Square, formated into transactions */
-/* and saved to the database. */
-/* Second, for the most recent transaction, it's closed_at date value */
-/* is saved as the lastSyncTime value for the store. */
-/* This is what keeps track of which transactions were synced and which were not. */
-const processTransactions = async (transactions) => {
-  logger("----------------------------------------");
-  logger("Processing " + transactions.length + " transactions...");
-  logger("----------------------------------------");
+/* This anonymous function initiates the program. */
+/* Program settings and a timestamp are logged to the console to ensure proper functionality. */
+/* A delay is introduced to give time to the user to cancel operation if settings are misconfigured, */
+/* as well as to avoid hitting any limits with Vendus API infrastructure. */
+/* Then, transactions are processed, one by one, by "processTransactions()". */
+/* After that, the program logs operation metrics before shutting down. */
+(async () => {
+  // Store start time to calculate total duration of operation
+  const startTime = process.hrtime();
 
-  // Order transactions by date ascending
-  transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
+  // Log current date and time
+  console.log("****************************************");
+  console.log(new Date().toISOString());
+  console.log("****************************************");
 
-  // Counters for logging progress
-  let invoicesCreated = 0;
-  let transactionsWithErrors = 0;
+  // Log the current settings
+  console.log();
+  console.log("----------------------------");
+  console.log("Test Mode: " + config.get("settings.test-mode"));
+  console.log("Send Emails: " + config.get("settings.send-digital-invoices"));
+  console.log("Delay: " + config.get("settings.safety-delay") + " miliseconds");
+  console.log("----------------------------");
+  console.log();
 
-  // For each transaction
-  for (const [index, transaction] of transactions.entries()) {
-    // Set the request options
-    const options = {
-      method: "POST",
-      url: "https://www.vendus.pt/ws/v1.2/documents",
-      auth: { username: config.get("secrets.vendus-api-key") },
-      data: JSON.stringify(
-        // Prepare the invoice details
-        processAPI.prepareInvoice(transaction)
-      ),
-    };
+  // Delay to ensure no limits are hit in Vendus API
+  console.log("Waiting for safety delay...");
+  await delay(config.get("settings.safety-delay"));
 
-    // Delay to ensure no limits are hit in Vendus API
-    await delay(config.get("settings.delay-between-runs") / 200);
+  // Connect to the database
+  await database.connect();
 
-    // For each transaction,
-    // try to request for an invoice to be created.
-    await axios(options)
-      // If successful:
-      .then(async ({ data: invoice }) => {
-        // const invoice = data;
-        // Check if transaction should be printed
-        if (transaction.should_print) {
-          // add it to the print queue.
-          await new PrintQueue({
-            locationShortName: transaction.locationShortName,
-            squareLocationID: transaction.squareLocationID,
-            vendusRegisterID: transaction.vendusRegisterID,
-            invoice_id: invoice.id,
-          }).save();
-        }
+  // Retrieve all transactions from the database
+  const transactions = await Transaction.find({});
 
-        // Remove the processed transaction from the queue only if test mode is disabled.
-        if (!config.get("settings.test-mode")) await transaction.remove();
+  // Begin processing transactions
+  if (transactions.length) await processAPI.processTransactions(transactions);
+  else console.log("No new transactions to process.");
 
-        // Add +1 to the counter,
-        invoicesCreated++;
-
-        // and log it's basic details for debugging.
-        logger(
-          "[" +
-            (index + 1) +
-            "/" +
-            transactions.length +
-            "] Invoice " +
-            invoice.number +
-            " created (" +
-            invoice.date +
-            ")" +
-            (transaction.should_print ? " [ print ]" : "")
-        );
-      })
-      // If an error occurs,
-      .catch(({ response }) => {
-        // add +1 to the counter
-        transactionsWithErrors++;
-        // and log it
-        logger();
-        logger("> Error occured while creating invoice.");
-        logger("> Transaction ID: " + transaction.id);
-        logger(
-          "> [" +
-            response.data.errors[0].code +
-            "] " +
-            response.data.errors[0].message
-        );
-        logger();
-      });
-  }
-
-  logger(); // Log end of operation.
-  logger("----------------------------------------");
-  logger("Done. " + transactions.length + " transactions processed.");
-  logger(invoicesCreated + " invoices created successfully.");
-  logger(transactionsWithErrors + " transactions with errors.");
-  logger("----------------------------------------");
-};
+  console.log();
+  console.log("- - - - - - - - - - - - - - - - - - - -");
+  console.log("Shutting down...");
+  await database.disconnect();
+  console.log("Operation took " + getDuration(startTime) / 1000 + " seconds.");
+  console.log("- - - - - - - - - - - - - - - - - - - -");
+  console.log();
+})();
 
 /* * */
 /* Returns a time interval for a provided start time. */

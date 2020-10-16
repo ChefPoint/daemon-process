@@ -28,11 +28,6 @@ module.exports = mongoose.model(
       maxlength: 100,
       required: true,
     },
-    vendusRegisterID: {
-      type: String,
-      maxlength: 100,
-      required: true,
-    },
     closed_at: {
       type: String,
       maxlength: 100,

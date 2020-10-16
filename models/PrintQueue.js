@@ -1,7 +1,7 @@
 "use strict";
 
 /* * * * * */
-/* PRINTQUEUE */
+/* PRINT QUEUE */
 /* * */
 
 /* * */
@@ -19,11 +19,6 @@ module.exports = mongoose.model(
       required: true,
     },
     squareLocationID: {
-      type: String,
-      maxlength: 30,
-      required: true,
-    },
-    vendusRegisterID: {
       type: String,
       maxlength: 30,
       required: true,

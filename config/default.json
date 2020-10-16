@@ -4,9 +4,11 @@
     "database-connection-string": "envar"
   },
   "settings": {
-    "test-mode": false,
+    "test-mode": true,
     "send-digital-invoices": true,
-    "default-tax-id": "INT",
-    "delay-between-runs": 120000
+    "safety-delay": 120000,
+    "register-id": 55569502,
+    "payment-id": 55569479,
+    "default-tax-id": "INT"
   }
 }

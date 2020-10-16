@@ -8,10 +8,9 @@
 /* IMPORTS */
 const config = require("config");
 const mongoose = require("mongoose");
-const logger = require("./logger");
 
 exports.connect = async function () {
-  logger("Connecting to MongoDB...");
+  console.log("Connecting to MongoDB...");
   await mongoose
     .connect(config.get("secrets.database-connection-string"), {
       useFindAndModify: false,
@@ -19,23 +18,23 @@ exports.connect = async function () {
       useCreateIndex: true,
       useUnifiedTopology: true, // Temporary fixes for deprecation warnings.
     })
-    .then(() => logger("Connected."))
+    .then(() => console.log("Connected."))
     .catch((error) => {
-      logger("Connection to MongoDB failed.");
-      logger("At database.js > mongoose.connect()");
-      logger(error);
+      console.log("Connection to MongoDB failed.");
+      console.log("At database.js > mongoose.connect()");
+      console.log(error);
       process.exit();
     });
 };
 
 exports.disconnect = async function () {
-  logger("Closing connection to MongoDB...");
+  console.log("Closing connection to MongoDB...");
   await mongoose
     .disconnect()
-    .then(() => logger("Disconnected from MongoDB."))
+    .then(() => console.log("Disconnected from MongoDB."))
     .catch((error) => {
-      logger("Failed closing connection to MongoDB.");
-      logger("At database.js > mongoose.disconnect()");
-      logger(error);
+      console.log("Failed closing connection to MongoDB.");
+      console.log("At database.js > mongoose.disconnect()");
+      console.log(error);
     });
 };
