@@ -4,7 +4,7 @@
     "database-connection-string": "envar"
   },
   "settings": {
-    "test-mode": true,
+    "test-mode": false,
     "send-digital-invoices": true,
     "safety-delay": 120000,
     "register-id": 55569502,

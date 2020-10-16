@@ -28,6 +28,7 @@ exports.processTransactions = async (transactions) => {
   console.log("----------------------------------------");
   console.log("Processing " + transactions.length + " transactions...");
   console.log("----------------------------------------");
+  console.log();
 
   // Order transactions by date ascending
   transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
@@ -38,21 +39,6 @@ exports.processTransactions = async (transactions) => {
 
   // For each transaction:
   for (const [index, transaction] of transactions.entries()) {
-    //
-    // If transactions are not from October
-    if (moment(transaction.closed_at).isBefore("2020-10-01")) {
-      console.log(
-        "!!! Transaction skipped! " +
-          moment(transaction.closed_at).format("YYYY[-]MM[-]DD")
-      );
-      continue;
-    } // else {
-    //   console.log(
-    //     "!!! Transaction NOT skipped: " +
-    //       moment(transaction.closed_at).format("YYYY[-]MM[-]DD")
-    //   );
-    // }
-
     // Prepare the invoice details
     const invoice = prepareInvoice(transaction);
 
