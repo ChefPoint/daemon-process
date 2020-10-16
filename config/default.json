@@ -5,8 +5,8 @@
   },
   "settings": {
     "test-mode": false,
-    "send-digital-invoices": true,
     "safety-delay": 120000,
+    "send-digital-invoices": true,
     "register-id": 55569502,
     "payment-id": 55569479,
     "default-tax-id": "INT"
