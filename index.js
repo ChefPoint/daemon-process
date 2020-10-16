@@ -49,7 +49,7 @@ const delay = require("./services/delay");
 
   // Begin processing transactions
   if (transactions.length) await processAPI.processTransactions(transactions);
-  else console.log("No new transactions to process.");
+  else console.log("\nNo new transactions to process.");
 
   console.log();
   console.log("- - - - - - - - - - - - - - - - - - - -");
