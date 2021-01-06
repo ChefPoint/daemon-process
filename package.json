@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/chefpoint/daemon-process#readme",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "config": "^3.3.2",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
