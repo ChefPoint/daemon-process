@@ -175,6 +175,6 @@ const setInvoiceClient = (customer) => {
       ? 'contabilidade@dynamic-benefit.com'
       : customer.email,
     send_email: config.get('settings.send-digital-invoices') ? 'yes' : 'no',
-    city: 'Lisboa',
+    address: 'Lisboa',
   };
 };
