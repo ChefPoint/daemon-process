@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* * * * * */
 /* PRINT QUEUE */
@@ -6,12 +6,12 @@
 
 /* * */
 /* IMPORTS */
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 /* * */
 /* Schema for MongoDB ["PrintQueue"] Object */
 module.exports = mongoose.model(
-  "PrintQueue",
+  'PrintQueue',
   new mongoose.Schema({
     locationShortName: {
       type: String,

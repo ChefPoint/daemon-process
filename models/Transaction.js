@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* * * * * */
 /* TRANSACTION */
@@ -6,12 +6,12 @@
 
 /* * */
 /* IMPORTS */
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 /* * */
 /* Schema for MongoDB ["Transaction"] Object */
 module.exports = mongoose.model(
-  "Transaction",
+  'Transaction',
   new mongoose.Schema({
     order_id: {
       type: String,

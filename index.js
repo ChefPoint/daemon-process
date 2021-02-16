@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* * * * * */
 /* CHEF POINT - DAEMON PROCESS */
@@ -6,11 +6,11 @@
 
 /* * */
 /* IMPORTS */
-const config = require("config");
-const database = require("./services/database");
-const processAPI = require("./services/processAPI");
-const Transaction = require("./models/Transaction");
-const delay = require("./services/delay");
+const config = require('config');
+const database = require('./services/database');
+const processAPI = require('./services/processAPI');
+const Transaction = require('./models/Transaction');
+const delay = require('./services/delay');
 
 /* * */
 /* This anonymous function initiates the program. */
@@ -24,22 +24,22 @@ const delay = require("./services/delay");
   const startTime = process.hrtime();
 
   // Log current date and time
-  console.log("****************************************");
+  console.log('****************************************');
   console.log(new Date().toISOString());
-  console.log("****************************************");
+  console.log('****************************************');
 
   // Log the current settings
   console.log();
-  console.log("----------------------------");
-  console.log("Test Mode: " + config.get("settings.test-mode"));
-  console.log("Send Emails: " + config.get("settings.send-digital-invoices"));
-  console.log("Delay: " + config.get("settings.safety-delay") + " miliseconds");
-  console.log("----------------------------");
+  console.log('----------------------------');
+  console.log('Test Mode: ' + config.get('settings.test-mode'));
+  console.log('Send Emails: ' + config.get('settings.send-digital-invoices'));
+  console.log('Delay: ' + config.get('settings.safety-delay') + ' miliseconds');
+  console.log('----------------------------');
   console.log();
 
   // Delay to ensure no limits are hit in Vendus API
-  console.log("Waiting for safety delay...");
-  await delay(config.get("settings.safety-delay"));
+  console.log('Waiting for safety delay...');
+  await delay(config.get('settings.safety-delay'));
 
   // Connect to the database
   await database.connect();
@@ -49,14 +49,14 @@ const delay = require("./services/delay");
 
   // Begin processing transactions
   if (transactions.length) await processAPI.processTransactions(transactions);
-  else console.log("\nNo new transactions to process.");
+  else console.log('\nNo new transactions to process.');
 
   console.log();
-  console.log("- - - - - - - - - - - - - - - - - - - -");
-  console.log("Shutting down...");
+  console.log('- - - - - - - - - - - - - - - - - - - -');
+  console.log('Shutting down...');
   await database.disconnect();
-  console.log("Operation took " + getDuration(startTime) / 1000 + " seconds.");
-  console.log("- - - - - - - - - - - - - - - - - - - -");
+  console.log('Operation took ' + getDuration(startTime) / 1000 + ' seconds.');
+  console.log('- - - - - - - - - - - - - - - - - - - -');
   console.log();
 })();
 
