@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* * * * * */
 /* PROCESS API */
@@ -6,12 +6,12 @@
 
 /* * */
 /* IMPORTS */
-const _ = require("lodash");
-const config = require("config");
-const moment = require("moment");
-const axios = require("axios");
-const delay = require("../services/delay");
-const PrintQueue = require("../models/PrintQueue");
+const _ = require('lodash');
+const config = require('config');
+const moment = require('moment');
+const axios = require('axios');
+const delay = require('../services/delay');
+const PrintQueue = require('../models/PrintQueue');
 
 /* * */
 /* This function is the one responsible for processing all transactions. */
@@ -25,13 +25,13 @@ const PrintQueue = require("../models/PrintQueue");
 /* does not run against any limits imposed by the Vendus API infrastructure. */
 exports.processTransactions = async (transactions) => {
   console.log();
-  console.log("----------------------------------------");
-  console.log("Processing " + transactions.length + " transactions...");
-  console.log("----------------------------------------");
+  console.log('----------------------------------------');
+  console.log('Processing ' + transactions.length + ' transactions...');
+  console.log('----------------------------------------');
   console.log();
 
   // Order transactions by date ascending
-  transactions = _.orderBy(transactions, ["closed_at"], ["asc"]);
+  transactions = _.orderBy(transactions, ['closed_at'], ['asc']);
 
   // Counters for logging progress
   let invoicesCreated = 0;
@@ -44,14 +44,14 @@ exports.processTransactions = async (transactions) => {
 
     // Set the request options
     const options = {
-      method: "POST",
-      url: "https://www.vendus.pt/ws/v1.2/documents",
-      auth: { username: config.get("secrets.vendus-api-key") },
+      method: 'POST',
+      url: 'https://www.vendus.pt/ws/v1.2/documents',
+      auth: { username: config.get('secrets.vendus-api-key') },
       data: JSON.stringify(invoice),
     };
 
     // Delay to ensure no API limits are hit
-    await delay(config.get("settings.safety-delay") / 200);
+    await delay(config.get('settings.safety-delay') / 200);
 
     // Request for an invoice to be created.
     await axios(options)
@@ -67,23 +67,23 @@ exports.processTransactions = async (transactions) => {
         }
 
         // Remove the processed transaction from the queue only if test mode is disabled.
-        if (!config.get("settings.test-mode")) await transaction.remove();
+        if (!config.get('settings.test-mode')) await transaction.remove();
 
         // Add +1 to the counter.
         invoicesCreated++;
 
         // Log it's basic details for debugging.
         console.log(
-          "[" +
+          '[' +
             (index + 1) +
-            "/" +
+            '/' +
             transactions.length +
-            "] Invoice " +
+            '] Invoice ' +
             invoice.number +
-            " created (" +
+            ' created (' +
             invoice.date +
-            ")" +
-            (transaction.should_print ? " [ print ]" : "")
+            ')' +
+            (transaction.should_print ? ' [ print ]' : '')
         );
       })
       // If an error occurs:
@@ -95,11 +95,11 @@ exports.processTransactions = async (transactions) => {
           // If there is a response available,
           // i.e. if the error is from Vendus API
           console.log();
-          console.log("> [" + (index + 1) + "/" + transactions.length + "]");
-          console.log("> Error occured while creating invoice.");
-          console.log("> Transaction ID: " + transaction.id);
-          console.log("> Code: " + error.response.data.errors[0].code);
-          console.log("> Message: " + error.response.data.errors[0].message);
+          console.log('> [' + (index + 1) + '/' + transactions.length + ']');
+          console.log('> Error occured while creating invoice.');
+          console.log('> Transaction ID: ' + transaction.id);
+          console.log('> Code: ' + error.response.data.errors[0].code);
+          console.log('> Message: ' + error.response.data.errors[0].message);
           console.log();
         } else {
           // If the error is NOT from Vendus API
@@ -111,11 +111,11 @@ exports.processTransactions = async (transactions) => {
   }
 
   console.log(); // Log end of operation.
-  console.log("----------------------------------------");
-  console.log("Done. " + transactions.length + " transactions processed.");
-  console.log(invoicesCreated + " invoices created successfully.");
-  console.log(transactionsWithErrors + " transactions with errors.");
-  console.log("----------------------------------------");
+  console.log('----------------------------------------');
+  console.log('Done. ' + transactions.length + ' transactions processed.');
+  console.log(invoicesCreated + ' invoices created successfully.');
+  console.log(transactionsWithErrors + ' transactions with errors.');
+  console.log('----------------------------------------');
 };
 
 /* * */
@@ -124,15 +124,15 @@ exports.processTransactions = async (transactions) => {
 const prepareInvoice = (transaction) => {
   let invoice = {
     // If true, only fiscally invalid invoices will be created
-    mode: config.get("settings.test-mode") ? "tests" : "normal",
+    mode: config.get('settings.test-mode') ? 'tests' : 'normal',
     // To which store should this invoice be attributed
-    register_id: config.get("settings.register-id"),
+    register_id: config.get('settings.register-id'),
     // The date of the transaction
-    date: moment(transaction.closed_at).format("YYYY[-]MM[-]DD"),
+    date: moment(transaction.closed_at).format('YYYY[-]MM[-]DD'),
     // Prepare final invoice items details
     items: setInvoiceItems(transaction.line_items),
     // Set payment method so a receipt is issued
-    payments: [{ id: config.get("settings.payment-id") }],
+    payments: [{ id: config.get('settings.payment-id') }],
   };
 
   // If transaction has customer NIF, add it to invoice
@@ -171,9 +171,10 @@ const setInvoiceClient = (customer) => {
   return {
     fiscal_id: customer.fiscal_id,
     name: customer.name,
-    email: config.get("settings.test-mode")
-      ? "contabilidade@dynamic-benefit.com"
+    email: config.get('settings.test-mode')
+      ? 'contabilidade@dynamic-benefit.com'
       : customer.email,
-    send_email: config.get("settings.send-digital-invoices") ? "yes" : "no",
+    send_email: config.get('settings.send-digital-invoices') ? 'yes' : 'no',
+    city: 'Lisboa',
   };
 };
