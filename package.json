@@ -25,10 +25,10 @@
     "config": "^3.3.6",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
-    "mongoose": "^5.12.13",
-    "npm": "^7.17.0"
+    "mongoose": "^5.13.2",
+    "npm": "^7.19.1"
   },
   "devDependencies": {
-    "jest": "^27.0.4"
+    "jest": "^27.0.6"
   }
 }
