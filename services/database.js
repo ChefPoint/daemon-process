@@ -12,12 +12,7 @@ const mongoose = require('mongoose');
 exports.connect = async function () {
   console.log('Connecting to MongoDB...');
   await mongoose
-    .connect(config.get('secrets.database-connection-string'), {
-      useFindAndModify: false,
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true, // Temporary fixes for deprecation warnings.
-    })
+    .connect(config.get('secrets.database-connection-string'))
     .then(() => console.log('Connected.'))
     .catch((error) => {
       console.log('Connection to MongoDB failed.');
